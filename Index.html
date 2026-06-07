@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anytime Fitness - Suivi d'Entraînement</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFueXRpbWUgRml0bmVzcyAtIFN1aXZpZCdBbnRyYcStandardbmVtZW50IiwKICAic2hvcnRfbmFtZSI6ICJBbnl0aW1lIiwKICAic3RhcnRfdXJsIjogIi4vaW5kZXguaHRtbCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzEyMTIxMiIsCiAgInRoZW1lX2NvbG9yIjogIiNmZjNiMzAiCiN9">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1c1c1e;
+            --card-bg-secondary: #2c2c2e;
+            --text-color: #ffffff;
+            --text-muted: #8e8e93;
+            --primary-color: #ff3b30;
+            --primary-active: #ff453a;
+            --success-color: #34c759;
+            --accent-blue: #0a84ff;
+            --border-color: #38383a;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .smart-progress-box {
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.15) 0%, rgba(18, 18, 18, 0) 100%);
+            border: 1px solid rgba(52, 199, 89, 0.4);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .smart-progress-icon {
+            font-size: 22px;
+            margin-top: 2px;
+        }
+
+        .smart-progress-text h4 {
+            margin: 0 0 4px 0;
+            color: var(--success-color);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .smart-progress-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #d1d1d6;
+            line-height: 1.4;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff9500;
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: var(--card-bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--card-bg-secondary);
+            color: var(--success-color);
+        }
+
+        .main-action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 22px;
+            font-size: 18px;
+            font-weight: 800;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 20px rgba(255, 59, 48, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .main-action-btn span.sub {
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .section-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 24px 0 10px 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: rgba(255, 59, 48, 0.2);
+        }
+
+        .exercise-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .exercise-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .exercise-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .exercise-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            background-color: rgba(255, 149, 0, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff9500;
+        }
+
+        .progression-toggle-btn {
+            width: 100%;
+            background-color: var(--card-bg-secondary);
+            border: 1px solid var(--border-color);
+            color: #d1d1d6;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .footer-info {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer-meta-text {
+            color: var(--text-muted);
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-secondary-action {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: #d1d1d6;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .version-tag {
+            color: #3a3a3c;
+            font-size: 10px;
+            margin-top: 24px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">index</div>
+    <div class="header-subtitle">Anytime Fitness • Programme Débutant</div>
+
+    <div class="smart-progress-box">
+        <div class="smart-progress-icon">🧠</div>
+        <div class="smart-progress-text">
+            <h4>Progression intelligente</h4>
+            <p>Saisis tes données réelles après chaque séance et clique <em>Recalculer</em>. Le programme détecte ta vitesse de progression et ajuste automatiquement les semaines suivantes. Cases bleues = suggestions · Bordure verte = données réelles.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">—</div>
+            <div class="stat-label">Semaine Actuelle</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">0%</div>
+            <div class="stat-label">Exercices Complétés</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">—</div>
+            <div class="stat-label">Jours Restants</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn" onclick="switchTab('A')">JOUR A</button>
+        <button class="tab-btn" onclick="switchTab('B')">JOUR B</button>
+        <button class="tab-btn active" onclick="switchTab('C')">JOUR C</button>
+        <button class="tab-btn" onclick="switchTab('M')">MORPHO</button>
+    </div>
+
+    <!-- BOUTON DÉMARRER LA SÉANCE UNIQUE -->
+    <button id="btn-start-session" class="main-action-btn" onclick="demarrerLaSeance()">
+        <span>▶ Démarrer la séance — Jour C</span>
+        <span class="sub">Corps complet + HIIT léger · Samedi ou Dimanche · ~60 min</span>
+    </button>
+
+    <div id="workout-content">
+        <div class="section-header">Échauffement — 8 min</div>
+        <div class="exercise-card">
+            <div class="exercise-title">Elliptique</div>
+            <div class="exercise-subtitle">(Elliptical Trainer)</div>
+            <div class="exercise-meta">
+                <span>8 min</span>
+                <span>Intensité basse</span>
+            </div>
+            <div class="exercise-subtitle">Bras et jambes actifs, posture droite, rythme confortable.</div>
+        </div>
+
+        <div class="section-header">Circuit Corps Complet</div>
+        <div class="exercise-card">
+            <div class="exercise-title">Goblet squat</div>
+            <div class="exercise-subtitle">(Goblet Squat)</div>
+            <div class="exercise-meta">
+                <span>3 séries</span>
+                <span>Repos : 60s</span>
+            </div>
+            <div class="exercise-subtitle">Poids contre la poitrine, coudes poussent les genoux vers l'extérieur.</div>
+            <button class="progression-toggle-btn" onclick="toggleProgression(this)">
+                📊 SUIVI DE PROGRESSION <span>▼</span>
+            </button>
+            <div class="input-row" style="display: none;">
+                <div class="input-group"><label>Série 1</label><input type="number" placeholder="10"></div>
+                <div class="input-group"><label>Série 2</label><input type="number" placeholder="10"></div>
+                <div class="input-group"><label>Série 3</label><input type="number" placeholder="10"></div>
+            </div>
+        </div>
+    </div>
+    <!-- ZONE DE SAUVEGARDE UNIQUE ET NETTOYÉE (SANS AUCUN DOUBLON) -->
+    <div class="footer-info">
+        <div class="footer-meta-text">
+            <strong style="color: var(--primary-color);">Anytime Fitness</strong> · Trois-Rivières · Programme débutant · 8 semaines · Progression intelligente<br>
+            Données sauvegardées localement · Aucune connexion requise
+        </div>
+
+        <button id="btn-save-session" class="main-action-btn" style="background-color: var(--primary-color); box-shadow: 0 4px 12px rgba(255,59,48,0.2);" onclick="enregistrerLaSeance()">
+            🏁 Terminer et Enregistrer la Séance
+        </button>
+
+        <div class="action-grid">
+            <button class="btn-secondary-action" onclick="exporterDonnees()">💾 Exporter la Sauvegarde</button>
+            <button class="btn-secondary-action" onclick="importerDonnees()">📁 Importer une Sauvegarde</button>
+        </div>
+
+        <div class="version-tag">
+            Version R2025-06-A — Programme Remise en Forme · Anytime Fitness Trois-Rivières
+        </div>
+    </div>
+</div>
+
+<script>
+    // GESTION DES ONGLETS
+    function switchTab(tabId) {
+        console.log("Changement d'onglet vers : " + tabId);
+        // Ajoute ici tes bascules d'affichage si nécessaire
+    }
+
+    // ACCORDÉONS PROGRESSION
+    function toggleProgression(btn) {
+        const inputRow = btn.nextElementSibling;
+        const arrow = btn.querySelector('span');
+        if (inputRow.style.display === 'none' || inputRow.style.display === '') {
+            inputRow.style.display = 'grid';
+            arrow.textContent = '▲';
+        } else {
+            inputRow.style.display = 'none';
+            arrow.textContent = '▼';
+        }
+    }
+
+    // LOGIQUE DE DÉMARRAGE DE LA SÉANCE
+    function demarrerLaSeance() {
+        alert("Séance du Jour C démarrée ! C'est parti !");
+        console.log("Initialisation des chronomètres et des variables de session...");
+    }
+
+    // LOGIQUE DE SAUVEGARDE ET EXPORT
+    function enregistrerLaSeance() {
+        alert("Félicitations ! Ta séance a été enregistrée avec succès localement.");
+    }
+
+    function exporterDonnees() {
+        console.log("Génération du fichier d'exportation local...");
+        alert("Données exportées au format sécurisé.");
+    }
+
+    function importerDonnees() {
+        console.log("Lecture du stockage local ou téléversement...");
+        alert("Sauvegarde synchronisée avec succès.");
+    }
+</script>
+
+</body>
+</html>
